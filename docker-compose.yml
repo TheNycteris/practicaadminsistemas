@@ -1,0 +1,32 @@
+services:
+  db:
+    image: mariadb:11.8
+    container_name: dbhost
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./db-init/init.sql:/docker-entrypoint-initdb.d/init.sql:z
+    environment:
+      MARIADB_ROOT_PASSWORD: "rootpassword123"
+      MARIADB_DATABASE: "uoc2026"
+      MARIADB_USER: "tu_alias_uoc" # <--- CAMBIA ESTO por tu alias real
+      MARIADB_PASSWORD: "userpassword123"
+
+  web:
+    build: ./bun-app
+    container_name: webhost
+    restart: unless-stopped
+    ports:
+      - "5000:3000"
+    environment:
+      DB_HOST: "db"
+      DB_USER: "tu_alias_uoc" # <--- CAMBIA ESTO
+      DB_PASSWORD: "userpassword123"
+      DB_NAME: "uoc2026"
+    depends_on:
+      - db
+
+volumes:
+  mariadb_data:
